@@ -49,30 +49,7 @@
 	import { onMount } from 'svelte';
 	import AOS from 'aos';
 
-	let { handleStartNow, handleLearnMore } = $props();
-
-	// Função para navegar para a página home
-	function startNow() {
-		if (handleStartNow) {
-			handleStartNow();
-		}
-		goto('/home');
-	}
-
-	// Função para mostrar mais informações
-	function learnMore() {
-		if (handleLearnMore) {
-			handleLearnMore();
-		}
-		// Scroll para a seção about
-		const aboutSection = document.getElementById('about-section');
-		if (aboutSection) {
-			aboutSection.scrollIntoView({ behavior: 'smooth' });
-		}
-	}
-
 	onMount(() => {
-		// Inicializar AOS
 		AOS.init({
 			duration: 800,
 			easing: 'ease-out',

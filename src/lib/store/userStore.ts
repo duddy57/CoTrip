@@ -1,4 +1,4 @@
-import type { User } from '$lib/schemas/users';
+import type { User } from '$lib/components/schemas/users';
 import { writable } from 'svelte/store';
 
 export const userStore = writable<User>({

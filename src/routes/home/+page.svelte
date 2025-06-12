@@ -6,8 +6,6 @@
 	import DataTable from '$lib/components/table-trips/data-table.svelte';
 	import { tripStore } from '$lib/store/tripsStore';
 	import { columns } from '$lib/components/table-trips/columns';
-	import { createTripResponseSchema } from '$lib/schemas/trips';
-	import type { z } from 'zod';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Badge } from '$lib/components/ui/badge';
 	import {
@@ -24,15 +22,16 @@
 	} from '@lucide/svelte';
 
 	let position = $state(0);
-	let tripsArray = $state<z.infer<typeof createTripResponseSchema>[]>([]);
 	let currentTime = $state('');
 	let greeting = $state('');
 	let weather = $state({ temp: 0, condition: 'sunny', city: 'São Paulo' });
-	let stats = $state({
-		totalTrips: 0,
-		upcomingTrips: 0,
-		completedTrips: 0,
-		totalDestinations: 0
+
+	let trips = $derived($tripStore);
+	let stats = $derived({
+		totalTrips: trips.length,
+		upcomingTrips: trips.filter((trip) => new Date(trip.startDate) > new Date()).length,
+		completedTrips: trips.filter((trip) => new Date(trip.endDate) < new Date()).length,
+		totalDestinations: new Set(trips.map((trip) => trip.destination)).size
 	});
 
 	let { data }: { data: PageData } = $props();
@@ -55,43 +54,36 @@
 		}
 	}
 
-	function getWeatherIcon(condition: string) {
-		switch (condition) {
-			case 'sunny':
-				return Sun;
-			case 'cloudy':
-				return Cloud;
-			case 'rainy':
-				return CloudRain;
-			default:
-				return Sun;
-		}
+	export function addTrip(newTrip: any) {
+		tripStore.update((trips) => [...trips, newTrip]);
 	}
 
 	onMount(() => {
-		tripStore.set([
-			{
-				id: '1',
-				title: 'Viagem para Paris',
-				destination: 'Paris, França',
-				startDate: '2024-06-15',
-				endDate: '2024-06-22'
-			},
-			{
-				id: '2',
-				title: 'Aventura no Rio',
-				destination: 'Rio de Janeiro, Brasil',
-				startDate: '2024-05-10',
-				endDate: '2024-05-17'
-			},
-			{
-				id: '3',
-				title: 'Exploração de Tóquio',
-				destination: 'Tóquio, Japão',
-				startDate: '2024-08-01',
-				endDate: '2024-08-10'
-			}
-		]);
+		if ($tripStore.length === 0) {
+			tripStore.update((trips) => [
+				{
+					id: '3',
+					title: 'Viagem para Paris',
+					destination: 'Paris, França',
+					startDate: '2024-06-15',
+					endDate: '2024-06-22'
+				},
+				{
+					id: '4',
+					title: 'Aventura no Rio',
+					destination: 'Rio de Janeiro, Brasil',
+					startDate: '2024-05-10',
+					endDate: '2024-05-17'
+				},
+				{
+					id: '5',
+					title: 'Exploração de Tóquio',
+					destination: 'Tóquio, Japão',
+					startDate: '2024-08-01',
+					endDate: '2024-08-10'
+				}
+			]);
+		}
 
 		weather = {
 			temp: Math.floor(Math.random() * 15) + 20,
@@ -128,7 +120,13 @@
 				</div>
 				<div class="flex items-center gap-4">
 					<div class="flex items-center gap-2 rounded-lg bg-white/20 px-4 py-2 backdrop-blur-sm">
-						<svelte:component this={getWeatherIcon(weather.condition)} class="h-5 w-5" />
+						{#if weather.condition === 'sunny'}
+							<Sun class="h-5 w-5 text-yellow-400" />
+						{:else if weather.condition === 'cloudy'}
+							<Cloud class="h-5 w-5 text-gray-400" />
+						{:else if weather.condition === 'rainy'}
+							<CloudRain class="h-5 w-5 text-blue-400" />
+						{/if}
 						<span class="font-semibold">{weather.temp}°C</span>
 						<span class="text-emerald-100">{weather.city}</span>
 					</div>
@@ -136,7 +134,7 @@
 			</div>
 		</div>
 
-		{#if tripsArray.length > 0}
+		{#if trips.length > 0}
 			<div class="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				<Card class="border-0 shadow-md transition-all duration-300 hover:shadow-lg">
 					<CardContent class="p-6">
@@ -204,11 +202,11 @@
 			<TripForm {data} />
 		</div>
 
-		{#if tripsArray.length > 0}
+		{#if trips.length > 0}
 			<div class="mb-8">
 				<h3 class="mb-4 text-lg font-semibold text-gray-900">🚀 Próximas Aventuras</h3>
 				<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-					{#each tripsArray.filter((trip) => new Date(trip.startDate) > new Date()) as trip}
+					{#each trips.filter((trip) => new Date(trip.startDate) > new Date()) as trip (trip.id)}
 						<Card
 							class="border-0 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
 						>

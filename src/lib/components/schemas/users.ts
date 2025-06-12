@@ -13,7 +13,7 @@ export const signUpRequestSchema = z
 		confirmPassword: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres')
 	})
 	.refine((data) => data.password === data.confirmPassword, {
-		message: "Passwords don't match",
+		message: 'As senhas não conferem',
 		path: ['confirmPassword']
 	});
 
@@ -36,6 +36,6 @@ export const updateProfileRequestSchema = z.object({
 
 export type UpdateProfileRequestTypeSchema = z.infer<typeof updateProfileRequestSchema>;
 export type User = z.infer<typeof userSchema>;
-export type SignInTypeSchema = z.infer<typeof sigInRequestSchema>;
-export type SignUpTypeSchema = z.infer<typeof signUpRequestSchema>;
+export type SignInTypeSchema = typeof sigInRequestSchema;
+export type SignUpTypeSchema = typeof signUpRequestSchema;
 export type AccessTokenResponseTypeSchema = z.infer<typeof accessTokenResponseSchema>;

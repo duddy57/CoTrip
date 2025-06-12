@@ -4,7 +4,7 @@ import {
 	accessTokenResponseSchema,
 	sigInRequestSchema,
 	signUpRequestSchema
-} from '$lib/schemas/users';
+} from '$lib/components/schemas/users.js';
 import { zod } from 'sveltekit-superforms/adapters';
 import { API_URL } from '$lib';
 import { redirect } from '@sveltejs/kit';
@@ -15,8 +15,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	return {
-		loginForm: await superValidate(zod(sigInRequestSchema)),
-		registerForm: await superValidate(zod(signUpRequestSchema))
+		signInForm: await superValidate(zod(sigInRequestSchema)),
+		signUpForm: await superValidate(zod(signUpRequestSchema))
 	};
 };
 
@@ -74,23 +74,38 @@ export const actions: Actions = {
 			const url = new URL('/app/Users/login', API_URL);
 
 			const response = await fetch(url.toString(), requestOptions);
-
 			const rawData = await response.json();
-
-			console.log('Raw data from sign-in:', rawData);
-
 			if (!response.ok) {
+				let errorMessage = 'Erro ao entrar. Por favor, tente novamente.';
+
+				if (rawData.errors) {
+					const errorMessages = [];
+					for (const key in rawData.errors) {
+						if (Array.isArray(rawData.errors[key])) {
+							errorMessages.push(...rawData.errors[key]);
+						} else {
+							errorMessages.push(rawData.errors[key]);
+						}
+					}
+					errorMessage = errorMessages.join(', ');
+				} else if (rawData.message) {
+					errorMessage = rawData.message;
+				} else if (rawData.title) {
+					errorMessage = rawData.title;
+				}
+
 				return {
 					form,
 					success: false,
-					message: rawData.message || 'Erro ao entrar. Por favor, tente novamente.'
+					message: errorMessage,
+					errorDetails: rawData.errors || rawData.message || rawData.title
 				};
 			}
 
-			// Valide os dados com o schema
+			console.log('Raw data from sign-in:', rawData);
+
 			const result = accessTokenResponseSchema.parse(rawData);
 
-			// Verifique se o accessToken existe
 			if (!result.accessToken) {
 				return { form, success: false, message: 'Token de acesso não encontrado.' };
 			}

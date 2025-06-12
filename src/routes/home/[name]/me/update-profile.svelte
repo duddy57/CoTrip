@@ -8,7 +8,7 @@
 	import { userStore } from '$lib/store/userStore';
 	import { Base64ToPng } from '$lib/utils';
 	import { superForm } from 'sveltekit-superforms';
-	import { updateProfileRequestSchema } from '$lib/schemas/users';
+	import { updateProfileRequestSchema } from '$lib/components/schemas/users';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { fade, scale, fly } from 'svelte/transition';
 	import {

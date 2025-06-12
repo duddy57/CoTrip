@@ -38,7 +38,7 @@
 			scrollY > 50 ? 'h-auto' : 'h-16'
 		)}
 	>
-		<Navbar />
+		<!-- <Navbar /> -->
 		{#if !isMainRoute}
 			<header class="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
 				<div class="flex h-16 max-w-4xl items-center justify-between px-4">

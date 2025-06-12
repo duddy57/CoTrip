@@ -37,57 +37,39 @@
 		<img src={logo_png} alt="Logo cotrip" class="w-16s h-10" />
 	</div>
 	<div>
-		{#if userStore != null}
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger
-					class="relative h-10 w-10 rounded-full transition-colors hover:bg-white/20"
-				>
-					<Avatar.Root class="h-10 w-10">
-						<Avatar.Image
-							style="background: {generateRandomColorGradient()}"
-							alt={$userStore.name}
-						/>
-						<Avatar.Fallback
-							class="bg-gradient-to-br from-blue-500 to-purple-600 font-bold text-white"
-						>
-							{getTwoLetter($userStore.name)}
-						</Avatar.Fallback>
-					</Avatar.Root>
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Content class="w-56 border border-white/30 bg-white/90 backdrop-blur-md">
-					<DropdownMenu.Group>
-						<DropdownMenu.Label class="font-normal">
-							<div class="flex flex-col space-y-1">
-								<p class="text-sm font-bold tracking-tight">{$userStore.name}</p>
-								<p class="text-muted-foreground text-xs">@{$userStore.email}</p>
-							</div>
-						</DropdownMenu.Label>
-						<DropdownMenu.Separator />
-						<DropdownMenu.Item
-							class="hover:bg-white/20"
-							onclick={() => {
-								goto(`/home/${$userStore.name}/me`);
-							}}>Perfil</DropdownMenu.Item
-						>
-						<DropdownMenu.Item class="hover:bg-white/20">Assinatura</DropdownMenu.Item>
-					</DropdownMenu.Group>
-				</DropdownMenu.Content>
-			</DropdownMenu.Root>
-		{:else}
-			<div class="flex gap-2">
-				<Button
-					class="border border-white/20 bg-blue-600/80 text-white backdrop-blur-sm transition-all hover:bg-blue-700/80"
-					onclick={() => goto('/auth?method=sign-in')}
-				>
-					Entrar
-				</Button>
-				<Button
-					class="border-white/30 bg-white/20 text-gray-800 backdrop-blur-sm transition-all hover:bg-white/30"
-					onclick={() => goto('/auth?method=sign-up')}
-				>
-					Registrar
-				</Button>
-			</div>
-		{/if}
+		<!-- {#if userStore != null} -->
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger
+				class="relative h-10 w-10 rounded-full transition-colors hover:bg-white/20"
+			>
+				<Avatar.Root class="h-10 w-10">
+					<Avatar.Image style="background: {generateRandomColorGradient()}" alt={$userStore.name} />
+					<Avatar.Fallback
+						class="bg-gradient-to-br from-blue-500 to-purple-600 font-bold text-white"
+					>
+						{getTwoLetter($userStore.name)}
+					</Avatar.Fallback>
+				</Avatar.Root>
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content class="w-56 border border-white/30 bg-white/90 backdrop-blur-md">
+				<DropdownMenu.Group>
+					<DropdownMenu.Label class="font-normal">
+						<div class="flex flex-col space-y-1">
+							<p class="text-sm font-bold tracking-tight">{$userStore.name}</p>
+							<p class="text-muted-foreground text-xs">@{$userStore.email}</p>
+						</div>
+					</DropdownMenu.Label>
+					<DropdownMenu.Separator />
+					<DropdownMenu.Item
+						class="hover:bg-white/20"
+						onclick={() => {
+							goto(`/home/${$userStore.name}/me`);
+						}}>Perfil</DropdownMenu.Item
+					>
+					<DropdownMenu.Item class="hover:bg-white/20">Assinatura</DropdownMenu.Item>
+				</DropdownMenu.Group>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+		<!-- s -->
 	</div>
 </div>

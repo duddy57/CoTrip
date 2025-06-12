@@ -1,7 +1,7 @@
 import DataTableActions from './data-table-actions.svelte';
 import { renderComponent } from '../ui/data-table';
 import type { ColumnDef } from '@tanstack/table-core';
-import type { CreateTripResponseTypeSchema } from '$lib/schemas/trips';
+import type { CreateTripResponseTypeSchema } from '$lib/components/schemas/trips';
 
 function formatDate(dateString: string | Date): string {
 	const date = new Date(dateString);

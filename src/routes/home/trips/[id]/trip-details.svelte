@@ -20,7 +20,7 @@
 		UserPlus
 	} from '@lucide/svelte';
 	import { onMount } from 'svelte';
-	import type { User } from '$lib/schemas/users';
+	import type { User } from '$lib/components/schemas/users';
 
 	let { id, user }: { id: string; user: User } = $props();
 
@@ -121,8 +121,10 @@
 				return;
 			}
 			const query = encodeURIComponent(trip.destination);
-			const unsplashUrl = `https://source.unsplash.com/1200x400/?${query},travel,city`;
-			heroImageUrl = unsplashUrl;
+			const unsplashUrl = `https://api.unsplash.com/search/photos?query=${query}&client_id=nONF-WxVf6Ch5arOyEpnpbDz5x3kLLy68VxT0RzJpug`;
+			const response = await fetch(unsplashUrl);
+			const data = await response.json();
+			heroImageUrl = data?.results[0]?.urls?.regular || '/images/default-trip.jpg';
 		} catch (error) {
 			console.error('Erro ao carregar imagem:', error);
 			heroImageUrl = '/images/default-trip.jpg';
@@ -156,17 +158,14 @@
 	}
 
 	function addActivity() {
-		// Implementar modal para adicionar atividade
 		console.log('Adicionar nova atividade');
 	}
 
 	function addLink() {
-		// Implementar modal para adicionar link
 		console.log('Adicionar novo link');
 	}
 
 	function inviteMember() {
-		// Implementar modal para convidar membro
 		console.log('Convidar novo membro');
 	}
 
@@ -176,7 +175,6 @@
 </script>
 
 <div class="min-h-screen bg-gray-50">
-	<!-- Hero Section -->
 	<div class="relative h-80 overflow-hidden">
 		{#if isImageLoading}
 			<div
@@ -192,12 +190,11 @@
 		{/if}
 		<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
 
-		<!-- Hero Content -->
 		<div class="absolute right-0 bottom-0 left-0 p-8">
 			<div class="container mx-auto max-w-6xl">
 				<div class="flex items-end justify-between">
 					<div class="text-white">
-						<h1 class="mb-2 text-4xl font-bold">{trip.tripName}</h1>
+						<h1 class="mb-2 text-4xl font-bold">{trip.title}</h1>
 						<div class="flex items-center gap-4 text-lg opacity-90">
 							<div class="flex items-center gap-2">
 								<MapPin class="h-5 w-5" />
@@ -229,9 +226,7 @@
 		</div>
 	</div>
 
-	<!-- Main Content -->
 	<div class="container mx-auto max-w-6xl p-8">
-		<!-- Trip Info Cards -->
 		<div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
 			<Card>
 				<CardContent class="p-6">
@@ -278,7 +273,6 @@
 			</Card>
 		</div>
 
-		<!-- Tabs Navigation -->
 		<Tabs bind:value={activeTab} class="w-full">
 			<TabsList class="mb-8 grid w-full grid-cols-4">
 				<TabsTrigger value="overview">Visão Geral</TabsTrigger>
@@ -287,21 +281,8 @@
 				<TabsTrigger value="members">Membros</TabsTrigger>
 			</TabsList>
 
-			<!-- Overview Tab -->
 			<TabsContent value="overview" class="space-y-6">
-				<Card>
-					<CardHeader>
-						<CardTitle>Descrição da Viagem</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<p class="leading-relaxed text-gray-700">
-							{trip.description || 'Nenhuma descrição disponível para esta viagem.'}
-						</p>
-					</CardContent>
-				</Card>
-
 				<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-					<!-- Recent Activities -->
 					<Card>
 						<CardHeader class="flex flex-row items-center justify-between">
 							<CardTitle class="text-lg">Atividades Recentes</CardTitle>
@@ -337,7 +318,6 @@
 						</CardContent>
 					</Card>
 
-					<!-- Team Members -->
 					<Card>
 						<CardHeader class="flex flex-row items-center justify-between">
 							<CardTitle class="text-lg">Membros da Equipe</CardTitle>
@@ -373,7 +353,6 @@
 				</div>
 			</TabsContent>
 
-			<!-- Activities Tab -->
 			<TabsContent value="activities" class="space-y-6">
 				<div class="flex items-center justify-between">
 					<h2 class="text-2xl font-bold">Atividades da Viagem</h2>
@@ -431,7 +410,6 @@
 				</div>
 			</TabsContent>
 
-			<!-- Links Tab -->
 			<TabsContent value="links" class="space-y-6">
 				<div class="flex items-center justify-between">
 					<h2 class="text-2xl font-bold">Links Úteis</h2>
@@ -469,7 +447,6 @@
 				</div>
 			</TabsContent>
 
-			<!-- Members Tab -->
 			<TabsContent value="members" class="space-y-6">
 				<div class="flex items-center justify-between">
 					<h2 class="text-2xl font-bold">Membros da Viagem</h2>

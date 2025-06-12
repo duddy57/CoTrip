@@ -40,9 +40,12 @@
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { Progress } from '$lib/components/ui/progress';
 
-	import SuperDebug, { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { createTripRequestSchema, type CreateTripRequestTypeSchema } from '$lib/schemas/trips';
+	import {
+		createTripRequestSchema,
+		type CreateTripRequestTypeSchema
+	} from '$lib/components/schemas/trips';
 	import {
 		CalendarDate,
 		DateFormatter,
@@ -56,7 +59,6 @@
 	import { ArrowLeft, ArrowRight, CalendarIcon } from '@lucide/svelte';
 	import { fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
 
 	let { data }: { data: { tripForm: SuperValidated<Infer<CreateTripRequestTypeSchema>> } } =
 		$props();
@@ -98,22 +100,26 @@
 	const form = superForm(data.tripForm, {
 		validators: zodClient(createTripRequestSchema),
 		scrollToError: 'smooth',
+		legacy: true,
+		onSubmit() {
+			isLoading = true;
+		},
 		onResult(result) {
 			isLoading = false;
-			if (result.result.type === 'success') {
+			if (result.result.type === 'success' && result.result.data?.success) {
 				isSuccess = true;
 				setTimeout(() => {
-					isSuccess = false;
-					currentStep = 0;
 					isOpen = false;
-				}, 3000);
-			} else {
-				console.error('Form submission failed:', result.result);
+					currentStep = 0;
+					steps.forEach((step, index) => {
+						step.isActive = index === 0;
+					});
+				}, 2000);
 			}
 		}
 	});
 
-	const { form: formData, enhance, message, errors } = form;
+	const { form: formData, enhance, message } = form;
 
 	const df = new DateFormatter('pt-BR', {
 		dateStyle: 'short'
@@ -380,11 +386,50 @@
 							</div>
 						</div>
 					</div>
+
+					<input type="hidden" name="title" value={$formData.title} />
+					<input type="hidden" name="destination" value={$formData.destination} />
+					<input type="hidden" name="startDate" value={$formData.startDate} />
+					<input type="hidden" name="endDate" value={$formData.endDate} />
 				</div>
 			{/if}
 
-			{#if browser}
-				<SuperDebug data={$formData} />
+			{#if currentStep < steps.length - 1}
+				<Form.Button
+					onclick={nextStep}
+					disabled={!canProceed()}
+					class="flex h-12 w-full items-center gap-2 px-6 transition-all hover:scale-105"
+				>
+					Próximo
+					<ArrowRight class="h-4 w-4" />
+				</Form.Button>
+			{:else}
+				<Form.Button
+					disabled={isLoading || !canProceed()}
+					class="flex h-12 w-full items-center gap-2 bg-green-600 px-6 transition-all hover:scale-105 hover:bg-green-700"
+				>
+					{#if isLoading}
+						<div
+							class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+						></div>
+						Criando...
+					{:else}
+						<Send class="h-4 w-4" />
+						Criar Viagem
+					{/if}
+				</Form.Button>
+			{/if}
+
+			{#if isSuccess && $message}
+				<div class="rounded-lg border border-green-200 bg-green-50 p-4">
+					<p class="text-sm font-medium text-green-800">{$message}</p>
+				</div>
+			{/if}
+
+			{#if !isSuccess && $message}
+				<div class="rounded-lg border border-red-200 bg-red-50 p-4">
+					<p class="text-sm font-medium text-red-800">{$message}</p>
+				</div>
 			{/if}
 		</form>
 		<Dialog.Footer class="flex items-center justify-between p-4">
@@ -393,43 +438,11 @@
 					variant="outline"
 					onclick={prevStep}
 					disabled={currentStep === 0}
-					class="flex h-12 items-center gap-2 px-6 transition-all hover:scale-105"
+					class="flex h-12 w-full items-center gap-2 px-6 transition-all hover:scale-105"
 				>
 					<ArrowLeft class="h-4 w-4" />
 					Anterior
 				</Button>
-
-				{#if currentStep < steps.length - 1}
-					<Button
-						onclick={nextStep}
-						disabled={!canProceed()}
-						class="flex h-12 items-center gap-2 px-6 transition-all hover:scale-105"
-					>
-						Próximo
-						<ArrowRight class="h-4 w-4" />
-					</Button>
-				{:else}
-					<Button
-						form="trip-form"
-						type="submit"
-						disabled={isLoading || !canProceed()}
-						class="bg-green-60 flex h-12 items-center gap-2 px-6 transition-all hover:scale-105 hover:bg-green-700"
-						onclick={(e) => {
-							e.preventDefault();
-							form.submit();
-						}}
-					>
-						{#if isLoading}
-							<div
-								class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
-							></div>
-							Criando...
-						{:else}
-							<Send class="h-4 w-4" />
-							Criar Viagem
-						{/if}
-					</Button>
-				{/if}
 			</div>
 		</Dialog.Footer>
 	</Dialog.Content>

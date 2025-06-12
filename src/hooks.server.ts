@@ -1,6 +1,6 @@
 import { API_URL } from '$lib';
 import type { Handle } from '@sveltejs/kit';
-import { userSchema } from '$lib/schemas/users';
+import { userSchema } from '$lib/components/schemas/users';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	if (event.locals.user) {

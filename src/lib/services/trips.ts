@@ -9,7 +9,8 @@ export async function getTrips(cookies: string) {
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${cookies}`
-			}
+			},
+			mode: 'cors'
 		});
 
 		if (!response.ok) {
