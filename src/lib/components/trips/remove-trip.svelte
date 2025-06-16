@@ -47,6 +47,7 @@
 				tripStore.update((trips) => {
 					return trips.filter((trip) => trip.id !== id);
 				});
+				window.location.reload();
 			}
 		}
 	});
@@ -80,10 +81,10 @@
 				</div>
 				<div>
 					<AlertDialog.Title class="text-xl font-semibold text-red-900 dark:text-red-100">
-						Remover viagem
+						Excluir viagem
 					</AlertDialog.Title>
 					<AlertDialog.Description class="text-red-700 dark:text-red-300">
-						Você tem certeza que deseja remover esta viagem?
+						Você tem certeza que deseja excluir esta viagem?
 					</AlertDialog.Description>
 				</div>
 			</div>
@@ -144,10 +145,10 @@
 			>
 				{#if isLoading}
 					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
-					Removendo...
+					Excluindo...
 				{:else}
 					<Trash2 class="mr-2 h-4 w-4" />
-					Remover membro
+					Excluir viagem
 				{/if}
 			</Button>
 		</AlertDialog.Footer>

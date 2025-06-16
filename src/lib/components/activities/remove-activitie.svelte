@@ -41,7 +41,10 @@
 		onResult(result) {
 			isLoading = false;
 			if (result.result.type === 'success') {
-				dialogOpen = false;
+				setTimeout(() => {
+					dialogOpen = false;
+					window.location.reload();
+				}, 2000);
 			}
 		}
 	});
