@@ -225,7 +225,7 @@
 							<DollarSign class="h-5 w-5 text-green-600" />
 						</div>
 						<div>
-							<p class="text-sm text-gray-600">Media de valor</p>
+							<p class="text-sm text-gray-600">Valor da viagem</p>
 							<p class="font-semibold">
 								{trip.budget ? `R$ ${trip.budget.toFixed(2)}` : 'Não definido'}
 							</p>

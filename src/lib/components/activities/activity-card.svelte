@@ -19,6 +19,7 @@
 							{activity.name}
 						</h3>
 						<p class="mb-3 text-gray-600">{activity.description}</p>
+						<p>R$ {activity.cost}</p>
 					</div>
 				</CardContent>
 			</Card>
