@@ -34,7 +34,6 @@
 	let sorting = $state<SortingState>([]);
 	let searchValue = $state('');
 
-	// Inscrever-se para atualizações do store
 	const unsubscribe = tripStore.subscribe((trips) => {
 		if (trips) {
 			data = trips as TData[];

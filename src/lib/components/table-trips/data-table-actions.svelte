@@ -3,8 +3,15 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { EllipsisIcon } from '@lucide/svelte';
+	import RemoveButton from './removeButton.svelte';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
+	import type { DeleteTripRequestTypeSchema } from '$lib/schemas/trips';
 
-	let { id }: { id: string } = $props();
+	let {
+		id,
+		data
+	}: { id: string; data: { deleteTrip: SuperValidated<Infer<DeleteTripRequestTypeSchema>> } } =
+		$props();
 </script>
 
 <DropdownMenu.Root>

@@ -4,7 +4,7 @@ import {
 	accessTokenResponseSchema,
 	sigInRequestSchema,
 	signUpRequestSchema
-} from '$lib/components/schemas/users.js';
+} from '$lib/schemas/users';
 import { zod } from 'sveltekit-superforms/adapters';
 import { API_URL } from '$lib';
 import { redirect } from '@sveltejs/kit';

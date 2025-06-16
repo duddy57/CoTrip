@@ -20,6 +20,8 @@
 		Clock,
 		Star
 	} from '@lucide/svelte';
+	import RemoveTrip from '$lib/components/trips/remove-trip.svelte';
+	import { Separator } from '$lib/components/ui/separator';
 
 	let position = $state(0);
 	let currentTime = $state('');
@@ -59,31 +61,7 @@
 	}
 
 	onMount(() => {
-		if ($tripStore.length === 0) {
-			tripStore.update((trips) => [
-				{
-					id: '3',
-					title: 'Viagem para Paris',
-					destination: 'Paris, França',
-					startDate: '2024-06-15',
-					endDate: '2024-06-22'
-				},
-				{
-					id: '4',
-					title: 'Aventura no Rio',
-					destination: 'Rio de Janeiro, Brasil',
-					startDate: '2024-05-10',
-					endDate: '2024-05-17'
-				},
-				{
-					id: '5',
-					title: 'Exploração de Tóquio',
-					destination: 'Tóquio, Japão',
-					startDate: '2024-08-01',
-					endDate: '2024-08-10'
-				}
-			]);
-		}
+		tripStore.set(data.trips || []);
 
 		weather = {
 			temp: Math.floor(Math.random() * 15) + 20,
@@ -210,9 +188,14 @@
 						<Card
 							class="border-0 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
 						>
+							<CardHeader>
+								<div class="flex flex-row items-center justify-between">
+									<h4 class="font-semibold text-gray-900">{trip.title}</h4>
+									<RemoveTrip {data} id={trip.id || ''} />
+								</div>
+							</CardHeader>
 							<CardContent class="p-6">
 								<div class="mb-3 flex items-start justify-between">
-									<h4 class="font-semibold text-gray-900">{trip.title}</h4>
 									<Badge variant="secondary" class="bg-emerald-100 text-emerald-700">Próxima</Badge>
 								</div>
 								<div class="space-y-2 text-sm text-gray-600">

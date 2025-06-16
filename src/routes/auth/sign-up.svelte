@@ -5,7 +5,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { signUpRequestSchema, type SignUpTypeSchema } from '$lib/components/schemas/users';
+	import { signUpRequestSchema, type SignUpTypeSchema } from '$lib/schemas/users';
 	import { goto } from '$app/navigation';
 	import { fly, fade, scale } from 'svelte/transition';
 	import { backOut } from 'svelte/easing';

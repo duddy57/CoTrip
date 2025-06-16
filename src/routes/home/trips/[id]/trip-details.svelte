@@ -1,11 +1,8 @@
 <script lang="ts">
-	import { tripStore } from '$lib/store/tripsStore.js';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import { Badge } from '$lib/components/ui/badge';
-	import { Separator } from '$lib/components/ui/separator';
-	import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
 	import {
 		Calendar,
 		MapPin,
@@ -17,51 +14,45 @@
 		Clock,
 		CheckCircle,
 		ExternalLink,
-		UserPlus
+		Stars,
+		Settings,
+		DollarSign
 	} from '@lucide/svelte';
 	import { onMount } from 'svelte';
-	import type { User } from '$lib/components/schemas/users';
+	import type { User } from '$lib/schemas/users';
+	import type { SuperValidated, Infer } from 'sveltekit-superforms';
+	import type { CreateTripActivityTypeSchema } from '$lib/schemas/activities';
+	import type {
+		AddMemberToTripRequestTypeSchema,
+		RemoveMemberForTripRequestTypeSchema
+	} from '$lib/schemas/members';
+	import { getTripsResponseSchema } from '$lib/schemas/trips';
+	import { memberStore } from '$lib/store/memberStore';
+	import { z } from 'zod';
+	import AddMember from '$lib/components/members/add-member.svelte';
+	import MemberCard from '$lib/components/members/member-card.svelte';
+	import AddActivity from '$lib/components/activities/add-activity.svelte';
+	import ActivityCard from '$lib/components/activities/activity-card.svelte';
+	import { activityStore } from '$lib/store/activityStore';
 
-	let { id, user }: { id: string; user: User } = $props();
+	let {
+		data
+	}: {
+		data: {
+			id: string;
+			user: User;
+			trip: z.infer<typeof getTripsResponseSchema>;
+			addActivity: SuperValidated<Infer<CreateTripActivityTypeSchema>>;
+			addMember: SuperValidated<Infer<AddMemberToTripRequestTypeSchema>>;
+			removeMember: SuperValidated<Infer<RemoveMemberForTripRequestTypeSchema>>;
+		};
+	} = $props();
 
-	let trip = $tripStore.find((trip) => trip.id === id);
-	if (!trip) {
-		throw new Error(`Trip with ID ${id} not found`);
-	}
+	let trip = data.trip;
 
 	let heroImageUrl = $state('');
 	let isImageLoading = $state(true);
 	let activeTab = $state('overview');
-
-	let activities = $state([
-		{
-			id: 1,
-			title: 'Visitar Torre Eiffel',
-			description: 'Subir até o topo e apreciar a vista',
-			date: '2024-07-15',
-			time: '14:00',
-			completed: false,
-			assignedTo: ['user1', 'user2']
-		},
-		{
-			id: 2,
-			title: 'Jantar no Le Jules Verne',
-			description: 'Restaurante no segundo andar da Torre Eiffel',
-			date: '2024-07-15',
-			time: '19:30',
-			completed: false,
-			assignedTo: ['user1']
-		},
-		{
-			id: 3,
-			title: 'Passeio pelo Louvre',
-			description: 'Visitar as principais obras de arte',
-			date: '2024-07-16',
-			time: '10:00',
-			completed: true,
-			assignedTo: ['user2']
-		}
-	]);
 
 	let usefulLinks = $state([
 		{
@@ -84,38 +75,9 @@
 		}
 	]);
 
-	let members = $state([
-		{
-			id: 'user1',
-			name: 'João Silva',
-			email: 'joao@email.com',
-			avatar: '/avatars/joao.jpg',
-			role: 'Organizador',
-			status: 'confirmed'
-		},
-		{
-			id: 'user2',
-			name: 'Maria Santos',
-			email: 'maria@email.com',
-			avatar: '/avatars/maria.jpg',
-			role: 'Participante',
-			status: 'confirmed'
-		},
-		{
-			id: 'user3',
-			name: 'Pedro Costa',
-			email: 'pedro@email.com',
-			avatar: '/avatars/pedro.jpg',
-			role: 'Participante',
-			status: 'pending'
-		}
-	]);
-
-	// Gerar imagem usando API (exemplo com Unsplash)
 	async function generateHeroImage() {
 		try {
 			isImageLoading = true;
-			// Usando Unsplash API para gerar imagem baseada no destino
 			if (!trip) {
 				heroImageUrl = '/images/default-trip.jpg';
 				return;
@@ -149,24 +111,8 @@
 		return diffDays;
 	}
 
-	function toggleActivity(activityId: number) {
-		const activity = activities.find((a) => a.id === activityId);
-		if (activity) {
-			activity.completed = !activity.completed;
-			activities = [...activities];
-		}
-	}
-
-	function addActivity() {
-		console.log('Adicionar nova atividade');
-	}
-
 	function addLink() {
 		console.log('Adicionar novo link');
-	}
-
-	function inviteMember() {
-		console.log('Convidar novo membro');
 	}
 
 	onMount(() => {
@@ -206,7 +152,7 @@
 							</div>
 							<div class="flex items-center gap-2">
 								<Users class="h-5 w-5" />
-								{members.length} pessoas
+								{$memberStore.length} pessoas
 							</div>
 						</div>
 					</div>
@@ -227,7 +173,7 @@
 	</div>
 
 	<div class="container mx-auto max-w-6xl p-8">
-		<div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+		<div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
 			<Card>
 				<CardContent class="p-6">
 					<div class="flex items-center gap-3">
@@ -265,7 +211,23 @@
 						<div>
 							<p class="text-sm text-gray-600">Participantes</p>
 							<p class="font-semibold">
-								{members.filter((m) => m.status === 'confirmed').length} confirmados
+								{$memberStore.filter((m) => m.inviteStatus === 1).length} confirmados
+							</p>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
+			<Card>
+				<CardContent class="p-6">
+					<div class="flex items-center gap-3">
+						<div class="rounded-lg bg-green-100 p-2">
+							<DollarSign class="h-5 w-5 text-green-600" />
+						</div>
+						<div>
+							<p class="text-sm text-gray-600">Media de valor</p>
+							<p class="font-semibold">
+								{trip.budget ? `R$ ${trip.budget.toFixed(2)}` : 'Não definido'}
 							</p>
 						</div>
 					</div>
@@ -274,11 +236,17 @@
 		</div>
 
 		<Tabs bind:value={activeTab} class="w-full">
-			<TabsList class="mb-8 grid w-full grid-cols-4">
+			<TabsList class="mb-8 grid w-full grid-cols-6">
 				<TabsTrigger value="overview">Visão Geral</TabsTrigger>
 				<TabsTrigger value="activities">Atividades</TabsTrigger>
 				<TabsTrigger value="links">Links Úteis</TabsTrigger>
 				<TabsTrigger value="members">Membros</TabsTrigger>
+				<TabsTrigger value="ia">
+					<Stars class="h-5 w-5" />
+				</TabsTrigger>
+				<TabsTrigger value="settings">
+					<Settings class="h-5 w-5" />
+				</TabsTrigger>
 			</TabsList>
 
 			<TabsContent value="overview" class="space-y-6">
@@ -291,30 +259,22 @@
 							</Button>
 						</CardHeader>
 						<CardContent class="space-y-3">
-							{#each activities.slice(0, 3) as activity}
-								<div class="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
-									<button
-										class={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-											activity.completed
-												? 'border-green-500 bg-green-500'
-												: 'border-gray-300 hover:border-green-400'
-										}`}
-										onclick={() => toggleActivity(activity.id)}
-									>
-										{#if activity.completed}
-											<CheckCircle class="h-3 w-3 text-white" />
-										{/if}
-									</button>
-									<div class="flex-1">
-										<p
-											class={`font-medium ${activity.completed ? 'text-gray-500 line-through' : ''}`}
-										>
-											{activity.title}
-										</p>
-										<p class="text-sm text-gray-600">{activity.date} às {activity.time}</p>
+							{#if $activityStore.length === 0}
+								<p class="text-gray-500">Nenhuma atividade registrada ainda.</p>
+							{:else}
+								{#each $activityStore.slice(0, 3) as activity}
+									<div class="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
+										<div class="flex-1">
+											<p class="font-medium text-gray-500">
+												{activity.name}
+											</p>
+											<p class="truncate overflow-hidden text-sm text-gray-600">
+												{activity.description}
+											</p>
+										</div>
 									</div>
-								</div>
-							{/each}
+								{/each}
+							{/if}
 						</CardContent>
 					</Card>
 
@@ -327,26 +287,20 @@
 						</CardHeader>
 						<CardContent>
 							<div class="space-y-3">
-								{#each members.slice(0, 3) as member}
-									<div class="flex items-center gap-3">
-										<Avatar>
-											<AvatarImage src={member.avatar || '/placeholder.svg'} alt={member.name} />
-											<AvatarFallback
-												>{member.name
-													.split(' ')
-													.map((n) => n[0])
-													.join('')}</AvatarFallback
-											>
-										</Avatar>
-										<div class="flex-1">
-											<p class="font-medium">{member.name}</p>
-											<p class="text-sm text-gray-600">{member.role}</p>
+								{#if $memberStore.length > 0}
+									{#each $memberStore.slice(0, 3) as member}
+										<div class="flex items-center gap-3">
+											<div class="flex-1">
+												<p class="font-medium">{member.name}</p>
+											</div>
+											<Badge variant={member.inviteStatus === 0 ? 'default' : 'secondary'}>
+												{member.inviteStatus === 1 ? 'Confirmado' : 'Pendente'}
+											</Badge>
 										</div>
-										<Badge variant={member.status === 'confirmed' ? 'default' : 'secondary'}>
-											{member.status === 'confirmed' ? 'Confirmado' : 'Pendente'}
-										</Badge>
-									</div>
-								{/each}
+									{/each}
+								{:else}
+									<p class="text-gray-500">Nenhum membro adicionado ainda.</p>
+								{/if}
 							</div>
 						</CardContent>
 					</Card>
@@ -356,58 +310,9 @@
 			<TabsContent value="activities" class="space-y-6">
 				<div class="flex items-center justify-between">
 					<h2 class="text-2xl font-bold">Atividades da Viagem</h2>
-					<Button onclick={addActivity}>
-						<Plus class="mr-2 h-4 w-4" />
-						Nova Atividade
-					</Button>
+					<AddActivity data={{ addActivity: data.addActivity }} />
 				</div>
-
-				<div class="space-y-4">
-					{#each activities as activity}
-						<Card class="transition-all hover:shadow-md">
-							<CardContent class="p-6">
-								<div class="flex items-start gap-4">
-									<button
-										class={`mt-1 flex h-6 w-6 items-center justify-center rounded-full border-2 ${
-											activity.completed
-												? 'border-green-500 bg-green-500'
-												: 'border-gray-300 hover:border-green-400'
-										}`}
-										onclick={() => toggleActivity(activity.id)}
-									>
-										{#if activity.completed}
-											<CheckCircle class="h-4 w-4 text-white" />
-										{/if}
-									</button>
-
-									<div class="flex-1">
-										<h3
-											class={`mb-2 text-lg font-semibold ${activity.completed ? 'text-gray-500 line-through' : ''}`}
-										>
-											{activity.title}
-										</h3>
-										<p class="mb-3 text-gray-600">{activity.description}</p>
-
-										<div class="flex items-center gap-4 text-sm text-gray-500">
-											<div class="flex items-center gap-1">
-												<Calendar class="h-4 w-4" />
-												{formatDate(activity.date)}
-											</div>
-											<div class="flex items-center gap-1">
-												<Clock class="h-4 w-4" />
-												{activity.time}
-											</div>
-											<div class="flex items-center gap-1">
-												<Users class="h-4 w-4" />
-												{activity.assignedTo.length} pessoa(s)
-											</div>
-										</div>
-									</div>
-								</div>
-							</CardContent>
-						</Card>
-					{/each}
-				</div>
+				<ActivityCard />
 			</TabsContent>
 
 			<TabsContent value="links" class="space-y-6">
@@ -450,49 +355,26 @@
 			<TabsContent value="members" class="space-y-6">
 				<div class="flex items-center justify-between">
 					<h2 class="text-2xl font-bold">Membros da Viagem</h2>
-					<Button onclick={inviteMember}>
-						<UserPlus class="mr-2 h-4 w-4" />
-						Convidar Membro
-					</Button>
+					<AddMember data={{ addMember: data.addMember }} />
 				</div>
 
-				<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-					{#each members as member}
-						<Card class="transition-all hover:shadow-md">
-							<CardContent class="p-6 text-center">
-								<Avatar class="mx-auto mb-4 h-16 w-16">
-									<AvatarImage src={member.avatar || '/placeholder.svg'} alt={member.name} />
-									<AvatarFallback class="text-lg">
-										{member.name
-											.split(' ')
-											.map((n) => n[0])
-											.join('')}
-									</AvatarFallback>
-								</Avatar>
+				<MemberCard data={{ removeMember: data.removeMember }} userOwnerId={trip.userOwnerId} />
+			</TabsContent>
 
-								<h3 class="mb-1 text-lg font-semibold">{member.name}</h3>
-								<p class="mb-2 text-gray-600">{member.email}</p>
-								<p class="mb-3 text-sm text-gray-500">{member.role}</p>
+			<TabsContent value="ia" class="space-y-6">
+				<Card>
+					<CardContent class="items-center p-6 text-center">
+						<p>Em breve</p>
+					</CardContent>
+				</Card>
+			</TabsContent>
 
-								<Badge
-									variant={member.status === 'confirmed' ? 'default' : 'secondary'}
-									class="mb-3"
-								>
-									{member.status === 'confirmed' ? 'Confirmado' : 'Pendente'}
-								</Badge>
-
-								<div class="flex justify-center gap-2">
-									<Button variant="outline" size="sm">Mensagem</Button>
-									{#if member.role !== 'Organizador'}
-										<Button variant="ghost" size="sm" class="text-red-600 hover:text-red-800">
-											Remover
-										</Button>
-									{/if}
-								</div>
-							</CardContent>
-						</Card>
-					{/each}
-				</div>
+			<TabsContent value="settings" class="space-y-6">
+				<Card>
+					<CardContent class="items-center p-6 text-center">
+						<p>Em breve</p>
+					</CardContent>
+				</Card>
 			</TabsContent>
 		</Tabs>
 	</div>

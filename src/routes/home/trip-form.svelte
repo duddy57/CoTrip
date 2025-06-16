@@ -42,10 +42,7 @@
 
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import {
-		createTripRequestSchema,
-		type CreateTripRequestTypeSchema
-	} from '$lib/components/schemas/trips';
+	import { createTripRequestSchema, type CreateTripRequestTypeSchema } from '$lib/schemas/trips';
 	import {
 		CalendarDate,
 		DateFormatter,
@@ -59,6 +56,8 @@
 	import { ArrowLeft, ArrowRight, CalendarIcon } from '@lucide/svelte';
 	import { fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
+	import { tripStore } from '$lib/store/tripsStore';
+	import { userStore } from '$lib/store/userStore';
 
 	let { data }: { data: { tripForm: SuperValidated<Infer<CreateTripRequestTypeSchema>> } } =
 		$props();
@@ -111,10 +110,21 @@
 				setTimeout(() => {
 					isOpen = false;
 					currentStep = 0;
+					form.reset();
 					steps.forEach((step, index) => {
 						step.isActive = index === 0;
 					});
 				}, 2000);
+				tripStore.update((trips) => [
+					...trips,
+					{
+						title: $formData.title,
+						destination: $formData.destination,
+						startDate: $formData.startDate,
+						endDate: $formData.endDate,
+						userOwnerId: $userStore.id
+					}
+				]);
 			}
 		}
 	});
