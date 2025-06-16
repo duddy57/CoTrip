@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from '../$types';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { updateProfileRequestSchema } from '$lib/components/schemas/users';
+import { updateProfileRequestSchema } from '$lib/schemas/users';
 import { API_URL } from '$lib';
 
 export const load: PageServerLoad = async ({ locals }) => {
