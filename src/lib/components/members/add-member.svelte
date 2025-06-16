@@ -39,6 +39,7 @@
 				setTimeout(() => {
 					dialogOpen = false;
 					isSuccess = false;
+					window.location.reload();
 				}, 2000);
 			} else if (result.result.type === 'error') {
 				hasError = true;
