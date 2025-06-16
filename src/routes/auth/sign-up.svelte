@@ -31,12 +31,12 @@
 				isSuccess = true;
 				setTimeout(() => {
 					isSuccess = false;
+					goto(`/auth?method=sign-in&next=${data.next}`, {
+						replaceState: true,
+						state: { message: 'Conta criada com sucesso! Faça login para continuar.' }
+					});
+					window.location.reload();
 				}, 3000);
-
-				goto(`/auth?method=sign-in&next=${data.next}`, {
-					replaceState: true,
-					state: { message: 'Conta criada com sucesso! Faça login para continuar.' }
-				});
 			}
 		}
 	});

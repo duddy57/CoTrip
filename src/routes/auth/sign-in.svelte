@@ -36,7 +36,8 @@
 						replaceState: true,
 						state: { message: 'Login realizado com sucesso!' }
 					});
-				}, 1000);
+					window.location.reload();
+				}, 2000);
 			} else if (result.result.type === 'error') {
 				hasError = true;
 			}
