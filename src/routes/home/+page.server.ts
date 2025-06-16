@@ -98,7 +98,8 @@ export const actions: Actions = {
 					title: form.data.title,
 					destination: form.data.destination,
 					startDate: form.data.startDate,
-					endDate: form.data.endDate
+					endDate: form.data.endDate,
+					description: form.data.description || 'Teste de descrição'
 				})
 			};
 
