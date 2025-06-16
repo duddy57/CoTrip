@@ -265,6 +265,9 @@ export const actions: Actions = {
 			return { form };
 		}
 
+		console.log('Dados: ', form.data);
+		console.log('Dados: ', id);
+
 		try {
 			const url = new URL('/app/Activities/create', API_URL);
 

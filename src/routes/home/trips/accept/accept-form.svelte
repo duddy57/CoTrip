@@ -73,7 +73,9 @@
 			if (result.result.type === 'success') {
 				isSuccess = true;
 				setTimeout(() => {
-					goto('/home/trips/' + data.tripId);
+					goto(`/home/trips/${data.tripId}`, {
+						replaceState: true
+					});
 				}, 2000);
 			} else if (result.result.type === 'error') {
 				hasError = true;
