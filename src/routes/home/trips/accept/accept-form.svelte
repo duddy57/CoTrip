@@ -73,7 +73,7 @@
 			if (result.result.type === 'success') {
 				isSuccess = true;
 				setTimeout(() => {
-					goto(`/home/trips/${data.tripId}`, {
+					goto(`/home`, {
 						replaceState: true
 					});
 				}, 2000);
