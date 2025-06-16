@@ -99,7 +99,7 @@ export const actions: Actions = {
 					destination: form.data.destination,
 					startDate: form.data.startDate,
 					endDate: form.data.endDate,
-					description: form.data.description || 'Teste de descrição'
+					description: 'Teste de descrição'
 				})
 			};
 
