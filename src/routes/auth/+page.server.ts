@@ -9,14 +9,17 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { API_URL } from '$lib';
 import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
+	const next = url.searchParams.get('next');
+
 	if (locals.user) {
 		return redirect(302, '/home');
 	}
 
 	return {
 		signInForm: await superValidate(zod(sigInRequestSchema)),
-		signUpForm: await superValidate(zod(signUpRequestSchema))
+		signUpForm: await superValidate(zod(signUpRequestSchema)),
+		next: next || '/home'
 	};
 };
 

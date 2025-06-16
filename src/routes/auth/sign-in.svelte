@@ -10,7 +10,8 @@
 	import { Mail, Lock, LogIn, AlertCircle, CheckCircle } from '@lucide/svelte';
 	import { goto } from '$app/navigation';
 
-	let { data }: { data: { signInForm: SuperValidated<Infer<SignInTypeSchema>> } } = $props();
+	let { data }: { data: { signInForm: SuperValidated<Infer<SignInTypeSchema>>; next: string } } =
+		$props();
 
 	let isSuccess = $state(false);
 	let isLoading = $state(false);
@@ -31,7 +32,7 @@
 			if (result.result.type === 'success') {
 				isSuccess = true;
 				setTimeout(() => {
-					goto('/home', {
+					goto(data.next, {
 						replaceState: true,
 						state: { message: 'Login realizado com sucesso!' }
 					});

@@ -15,7 +15,7 @@
 			<Card class="transition-all hover:shadow-md">
 				<CardContent class="p-6">
 					<div class="flex-1">
-						<h3 class="mb-2 text-lg font-semibold text-gray-500">
+						<h3 class="mb-2 text-lg font-semibold">
 							{activity.name}
 						</h3>
 						<p class="mb-3 text-gray-600">{activity.description}</p>

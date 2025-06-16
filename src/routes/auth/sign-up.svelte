@@ -11,7 +11,8 @@
 	import { backOut } from 'svelte/easing';
 	import { Mail, Lock, User, CheckCircle, UserPlus } from '@lucide/svelte';
 
-	let { data }: { data: { signUpForm: SuperValidated<Infer<SignUpTypeSchema>> } } = $props();
+	let { data }: { data: { signUpForm: SuperValidated<Infer<SignUpTypeSchema>>; next: string } } =
+		$props();
 
 	let isLoading = $state(false);
 	let isSuccess = $state(false);
@@ -32,7 +33,7 @@
 					isSuccess = false;
 				}, 3000);
 
-				goto('/auth?method=sign-in', {
+				goto(`/auth?method=sign-in&next=${data.next}`, {
 					replaceState: true,
 					state: { message: 'Conta criada com sucesso! Faça login para continuar.' }
 				});
