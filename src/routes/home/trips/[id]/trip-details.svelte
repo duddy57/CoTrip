@@ -310,7 +310,7 @@
 			<TabsContent value="activities" class="space-y-6">
 				<div class="flex items-center justify-between">
 					<h2 class="text-2xl font-bold">Atividades da Viagem</h2>
-					<AddActivity data={{ addActivity: data.addActivity }} />
+					<AddActivity {data} />
 				</div>
 				<ActivityCard />
 			</TabsContent>

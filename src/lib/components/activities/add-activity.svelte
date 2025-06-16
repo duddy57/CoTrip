@@ -14,8 +14,11 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Textarea } from '$lib/components/ui/textarea';
+	import { onMount } from 'svelte';
 
-	let { data }: { data: { addActivity: SuperValidated<Infer<CreateTripActivityTypeSchema>> } } =
+	let {
+		data
+	}: { data: { addActivity: SuperValidated<Infer<CreateTripActivityTypeSchema>>; id: string } } =
 		$props();
 
 	let isLoading = $state(false);
@@ -58,6 +61,10 @@
 			hasError = false;
 		}
 	}
+
+	onMount(() => {
+		$formData.tripId = data.id;
+	});
 </script>
 
 <Dialog.Root bind:open={dialogOpen} onOpenChange={handleDialogChange}>
@@ -158,6 +165,15 @@
 								class="resize-none"
 								bind:value={$formData.description}
 							/>
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+
+				<Form.Field {form} name="tripId">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Input {...props} bind:value={$formData.tripId} type="hidden" class="mt-1" />
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />
