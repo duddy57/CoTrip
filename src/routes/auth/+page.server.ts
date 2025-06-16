@@ -113,6 +113,7 @@ export const actions: Actions = {
 			cookies.set('accessToken', result.accessToken, {
 				httpOnly: true,
 				path: '/',
+				secure: true,
 				maxAge: result.expireAt.getTime() - Date.now()
 			});
 
